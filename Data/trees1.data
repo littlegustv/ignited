@@ -1,0 +1,6 @@
+300:MOVE3Player
+299:STOPPlayer
+285:CREATE1056,-1,EFFECT,snowball,./Pixelart/snowball.png,,-4,0,1000,
+225:CHANGE_IClaire:./Pixelart/char5trip.png
+200:GOTO6,128,384
+195:END

@@ -1,0 +1,37 @@
+I want the game to start off saying at the bottom 1940s London With 
+Claire yelling at her mom and claire
+ saying (Claire:I hate you) Then i want fire to come out of her hands 
+and then the building needs to catch on fire I want them to be trapped in the house and have a bookshelf fall on clairs
+ mom then clair /CHOICE/
+ needs to try to help her by trying to pull 
+her out or run out of the house but if she stays and trys to help say (Clair:whats going on whats wrong with me) 
+then ciera says (Ciera:its ok you will understand some day now go you cant
+save me if this house falls it will crush you)/CHOICE/ then i want whoevers playing the game have to find the 
+front door while having things fall infront of claire and
+while their trying to find their way out since theres no voices only dialogue have tears coming off her or something
+like that when she gets out have the house collapse and fireman arive then i want a fireman to run up to her and
+say(stranger: are you ok why arent you burnt then i want clair to say (Claire:i dont know I.....I...Im not......) 
+then i want her to run 
+into the woods when shes running in the woods let whoevers playing the game get to move her down a trail through the 
+forest dont let them get off the trail then as they  move her  have her trip at a 
+certain point in the
+trail and then she needs to pass out and thats how i want it to end with her passed out so the screen should go black 
+after she trips
+
+WASD keys
+
+needs:
+ciera - sprite, dialoguetree
+"obstacles" - appear passable, but animate when collided and become solid
+	- falling bookcase
+	- holes in floor
+	- falling rubble
+	
+actions: create object (item or npc or obstacle or hazard)
+	-set new dialogue
+	
+also: auto start dialogue (i.e. npcs who can initiate dialogue)
+
+exterior environment, and woods
+
+fireman (and truck?) and ciera sprite

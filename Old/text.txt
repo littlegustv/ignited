@@ -1,0 +1,22 @@
+-Ignited - NPC dialogue.
+{Tell me more.
+-Dialogue has a tree structure
+{Continue...
+-So far it doesn't affect anything else in the game.
+}
+{Which means...
+-Different choices give different responses
+}
+}
+{Ask about game.
+-So far there's movement, interaction framework.
+{What next?
+-Save/load games, loading levels from datafiles.
+}
+}
+{Nothing else
+-Ok then.
+}
+{More: Background tiles
+-Tile layout done (partly) with TILED map editor. 
+}

@@ -1,0 +1,8 @@
+185:CREATE224,256,EFFECT,flamethrow,./Pixelart/flamethrow.png,,0,0,10,
+140:CREATE256,256,HAZARD,fire,./Pixelart/flames.png,,,,
+135:CREATE256,288,HAZARD,fire,./Pixelart/flames.png,,,,
+134:SHAKE
+130:CREATE512,352,HAZARD,fire,./Pixelart/flames.png,,,,
+120:CREATE256,320,HAZARD,fire,./Pixelart/flames.png,,,,
+110:CREATE448,128,HAZARD,fire,./Pixelart/flames.png,,,,
+100:END

@@ -1,0 +1,22 @@
+-This is an item.
+{What is an item?
+-An item can be interacted with or picked up.
+}
+{Can I pick it up?
+-Yes, but the inventory is still basic...
+{Go Back (not ready yet)
+-Gone back!  Not really.
+}
+{Pick up item.
+-GET
+}
+}
+{This is a dialogue box (more).
+-Items and NPCs can be interacted with similarly.
+}
+{Saved place in dialogue
+-Continuing dialogue again picks up at same place.
+{Reset dialogue
+-Dialogue can't be reset yet, but could be soon.
+}
+}

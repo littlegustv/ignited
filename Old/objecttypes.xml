@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttypes>
+ <objecttype name="Item" color="#0000ff"/>
+ <objecttype name="Wall" color="#53a459"/>
+ <objecttype name="Exit" color="#a40002"/>
+</objecttypes>

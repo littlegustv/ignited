@@ -1,0 +1,9 @@
+300:STOPPlayer
+295:MOVE0Player
+270:MOVE3IceQueen
+200:SHAKE
+181:STOPPlayer
+172:CREATE176,720,BG,collapsed,./Pixelart/Wreckage.png
+171:CREATE384,768,HAZARD,fire2,./Pixelart/flames.png
+170:CREATE256,768,HAZARD,fire,./Pixelart/flames.png
+40:END

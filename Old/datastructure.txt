@@ -1,0 +1,37 @@
+map datafile:
+
+	mapsizeX
+	mapsizeY
+
+	[tileset - image filenames combined with number codes]
+	background tiles
+	array (mapsizeX * mapsizeY)
+		-> load in to Level Object
+		
+	game objects:
+	Walls (x, y, image)
+	NPCS (x, y, image, filename)
+	Items (x, y, image, filename)
+	Player (x, Y)
+	Exit (x, y, image?)
+
+NPC/Item datafile:
+
+	name
+	tree {desc, choice1, 
+					{tree1desc, choice1, 
+									{tree11desc, choice1,
+													{}, 
+												choice2, 
+													{}
+									},
+								choice2, 
+									{}
+					}, 
+				choice2, 
+					{tree2desc, choice1,
+									{},
+								choice2,
+									{}
+					}
+		}

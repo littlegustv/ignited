@@ -1,0 +1,568 @@
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <list>
+#include <math.h>
+
+#include "globals.h"
+#include "GameObject.h"
+#include "Player.h"
+#include "Wall.h"
+#include "DialogueTree.h"
+#include "Dialogue.h"
+#include "NPC.h"
+#include "Item.h"
+#include "Background.h"
+#include "Hazard.h"
+
+#include "Level.h"
+
+bool keys[] = { false, false, false, false, false };
+
+//globals
+Player *player;
+
+std::list<GameObject *> objects;
+std::list<GameObject *>::iterator iter;
+std::list<GameObject *>::iterator iter2;
+
+//prototypes
+void __cdecl TakeLife();
+void __cdecl ScorePoint();
+
+void ChangeState(int &state, int newState);
+//bool SortByY(GameObject *a, GameObject *b);
+//ALLEGRO_SAMPLE_INSTANCE *songInstance;
+ALLEGRO_BITMAP *playerImage = NULL;
+
+
+int main(void)
+{
+	bool done = false;
+	bool render = false;
+
+	float gameTime = 0;
+	int frames = 0;
+	int gameFPS = 0;
+
+	/*Project Variables*/
+	
+	int state = -1;
+	/*
+	ALLEGRO_BITMAP *wallImage = NULL;
+	ALLEGRO_BITMAP *dialogueImage = NULL;
+	ALLEGRO_BITMAP *npcImage = NULL;
+	ALLEGRO_BITMAP *itemImage = NULL;
+	ALLEGRO_BITMAP *fireImage = NULL;
+/*	ALLEGRO_SAMPLE *shot = NULL;
+	ALLEGRO_SAMPLE *boom = NULL;
+	ALLEGRO_SAMPLE *song = NULL;
+	*/
+
+	/*Allegro Variables*/
+	ALLEGRO_DISPLAY *display = NULL;
+	ALLEGRO_TIMER *timer = NULL;
+	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	ALLEGRO_FONT *font18 = NULL;
+
+	/*Init Allegro and Display*/
+	if (!al_init())
+		return -1;
+
+	display = al_create_display(WIDTH, HEIGHT);
+
+	if (!display)
+		return -1;
+
+	/*Addons Install*/
+
+	al_init_primitives_addon();
+	al_install_keyboard();
+	al_init_font_addon();
+	al_init_ttf_addon();
+	al_init_image_addon();
+	al_install_audio();
+	al_init_acodec_addon();
+
+	/*Project Init*/
+
+	Level *l1 = new Level(al_get_backbuffer(display));
+
+	font18 = al_load_font("Play-Regular.ttf", 18, 0);
+	//al_reserve_samples(15);
+	/*
+	player = new Player();
+
+	playerImage = al_load_bitmap("Char2.png");
+	wallImage = al_load_bitmap("Wall1.png");
+	dialogueImage = al_load_bitmap("dialoguebox.png");
+	npcImage = al_load_bitmap("catsprite.png");
+	itemImage = al_load_bitmap("item.png");
+	fireImage = al_load_bitmap("flame.png");
+
+	player->Init(playerImage);
+
+/*	backgroundImage = al_load_bitmap("starBG.png");
+	middlegroundImage = al_load_bitmap("starMG.png");
+	foregroundImage = al_load_bitmap("starFG.png");
+
+	/*
+	Background *bg = new Background(backgroundImage, 1);
+	objects.push_back(bg);
+
+	bg = new Background(middlegroundImage, 3);
+	objects.push_back(bg);
+
+	bg = new Background(foregroundImage, 5);
+	objects.push_back(bg);
+	*/
+	/*
+	shipImage = al_load_bitmap("spaceship_by_arboris.png");
+	al_convert_mask_to_alpha(shipImage, al_map_rgb(255, 0, 255));
+	cometImage = al_load_bitmap("asteroid-1-96.png");
+	explosionImage = al_load_bitmap("explosion_3_40_128.png");
+
+	ship->Init(shipImage);
+
+	objects.push_back(ship);
+
+	titleImage = al_load_bitmap("Shooter_Title.png");
+	lostImage = al_load_bitmap("Shooter_Lose.png");
+
+/*	Background *titleScreen = new Background(titleImage, 0);
+	Background *lostScreen = new Background(lostImage, 0);
+
+	shot = al_load_sample("shot.ogg");
+	boom = al_load_sample("boom.ogg");
+	song = al_load_sample("song.ogg");
+
+	songInstance = al_create_sample_instance(song);
+	al_set_sample_instance_playmode(songInstance, ALLEGRO_PLAYMODE_LOOP);
+
+	al_attach_sample_instance_to_mixer(songInstance, al_get_default_mixer());
+	*/
+/*	ALLEGRO_BITMAP *bb = al_get_backbuffer(display);
+
+	Background *b = new Background("bg1.txt", bb);
+	objects.push_back(b);
+
+	Background *b2 = new Background("bg2.txt", bb);
+	objects.push_back(b2);
+
+	Hazard *h = new Hazard(256, 256, fireImage);
+	objects.push_back(h);
+
+	GameObject *interacting = NULL;
+	Dialogue *di = NULL;//new Dialogue(d, dialogueImage, font18);
+	*/
+	ChangeState(state, PLAYING);
+	/*
+
+	for (int i = 0; i <= WIDTH / tileSize; i++)
+	{
+		Wall *w = new Wall(i*tileSize, 64, wallImage);
+		objects.push_back(w);
+	}
+
+	NPC *n = new NPC(320, 320, npcImage, "text.txt");
+	objects.push_back(n);
+	
+	NPC *n1 = new NPC(320, 160, npcImage, "text.txt");
+	objects.push_back(n1);
+	
+	Item *i = new Item(224, 448, itemImage, "item.txt");
+	objects.push_back(i);
+
+	Item *i2 = new Item(160, 320, itemImage, "item.txt");
+	objects.push_back(i2);
+	
+	objects.push_back(player);
+	*/
+
+	/*Timer Init and Startup*/
+
+	srand(time(NULL));
+
+	timer = al_create_timer(1.0 / 60);
+	event_queue = al_create_event_queue();
+
+	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));
+	al_register_event_source(event_queue, al_get_display_event_source(display));
+
+	al_start_timer(timer);
+
+
+	//debug stuff:
+	double fps = 0;
+	int frames_done = 0;
+	double old_time = al_get_time();
+
+
+	while (!done)
+	{
+		ALLEGRO_EVENT ev;
+		al_wait_for_event(event_queue, &ev);
+
+		if (ev.type == ALLEGRO_EVENT_TIMER)
+		{
+			render = true;
+
+			/*Update FPS?!*/
+			frames++;
+			if (al_current_time() - gameTime >= 1)
+			{
+				gameTime = al_current_time();
+				gameFPS = frames;
+				frames = 0;
+			}
+			if (l1->state == PLAYING)
+			{
+				if (keys[UP])
+					l1->player->Move(UP);
+				if (keys[DOWN])
+					l1->player->Move(DOWN);
+				if (keys[LEFT])
+					l1->player->Move(LEFT);
+				if (keys[RIGHT])
+					l1->player->Move(RIGHT);
+
+
+				if (!keys[UP] && !keys[DOWN])
+					l1->player->ResetAnimation(1);
+				if (!keys[RIGHT] && !keys[LEFT])
+					l1->player->ResetAnimation(0);
+
+				/*Create new comets
+				if (rand() % 100 == 0)
+				{
+				Comet *comet = new Comet(WIDTH, 30 + rand() % (HEIGHT - 60), cometImage, &TakeLife);
+				objects.push_back(comet);
+				}
+				*/
+				l1->Collide();
+				/*Collisions*/
+				/*				for (iter = objects.begin(); iter != objects.end(); ++iter)
+								{
+								if (!(*iter)->Collideable()) continue;
+
+								for (iter2 = iter; iter2 != objects.end(); ++iter2)
+								{
+								if (!(*iter2)->Collideable()) continue;
+								/*						for (int i = 0; i < 10; i++)
+								{
+								if ((*iter)->CheckID((*iter2)->GetID(i)))
+								continue;
+								}
+
+								if ((*iter)->CheckCollisions((*iter2)))
+								{
+								(*iter)->Collided((*iter2));
+								(*iter2)->Collided((*iter));
+
+								/*		Explosion *explosion = new Explosion(((*iter)->GetX() + (*iter2)->GetX()) / 2, ((*iter)->GetY() + (*iter2)->GetY()) / 2, explosionImage);
+								objects.push_back(explosion);
+								al_play_sample(boom, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
+								}
+								}
+								}*/
+
+				l1->Update();
+				l1->CleanUp();
+				/*Update Section*/
+				/*
+				for (iter = objects.begin(); iter != objects.end(); ++iter)
+				{
+				(*iter)->Update();
+				}*/
+
+
+				/*if (ship->GetLives() <= 0)
+					ChangeState(state, LOST);*/
+
+				//	}
+				/*Remove "Dead"*/
+				/*for (iter = objects.begin(); iter != objects.end();)
+				{
+				if (!(*iter)->GetAlive())
+				{
+				delete(*iter);
+				iter = objects.erase(iter);
+				}
+				else
+				{
+				iter++;
+				}
+				}*/
+
+				/*if (player->GetHealth() <= 0)
+					ChangeState(state, TITLE);
+					*/
+			}
+		}
+			else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+			{
+				switch (ev.keyboard.keycode)
+				{
+				case ALLEGRO_KEY_ESCAPE:
+					if (l1->state == PLAYING)
+						done = true;
+					else if (l1->state == DIALOGUE)
+						l1->ChangeState(PLAYING);
+					break;
+				case ALLEGRO_KEY_UP:
+					keys[DOWN] = false, keys[RIGHT] = false, keys[LEFT] = false;
+					keys[UP] = true;
+					if (l1->state == DIALOGUE)
+						l1->di->MoveChoice(0);
+					break;
+				case ALLEGRO_KEY_DOWN:
+					keys[UP] = false, keys[RIGHT] = false, keys[LEFT] = false;
+					keys[DOWN] = true;
+					if (l1->state == DIALOGUE)
+						l1->di->MoveChoice(1);
+					break;
+				case ALLEGRO_KEY_LEFT:
+					keys[DOWN] = false, keys[RIGHT] = false, keys[UP] = false;
+					keys[LEFT] = true;
+					break;
+				case ALLEGRO_KEY_RIGHT:
+					keys[DOWN] = false, keys[UP] = false, keys[LEFT] = false;
+					keys[RIGHT] = true;
+					break;
+				case ALLEGRO_KEY_SPACE:
+					keys[SPACE] = true;
+					if (l1->state == DIALOGUE)
+					{
+						if (!l1->di->MakeChoice())
+						{
+							l1->interacting->SetTree(l1->di->GetTree());
+							l1->ChangeState(PLAYING);
+						}
+					}
+					else if (l1->state == TITLE)
+					{
+						l1->ChangeState(PLAYING);
+					}
+					else if (l1->state == PLAYING)
+					{
+						/*Check if there is an object close to player*/
+						/*for (iter = objects.begin(); iter != objects.end(); ++iter)
+						{
+						if ((*iter)->CheckID(INTERACT))
+						{
+						if ((player->GetFacing() == RIGHT && (*iter)->GetX() == player->GetX() + tileSize && player->GetY() == (*iter)->GetY()) ||
+						(player->GetFacing() == LEFT && (*iter)->GetX() == player->GetX() - tileSize && player->GetY() == (*iter)->GetY()) ||
+						(player->GetFacing() == UP && (*iter)->GetY() == player->GetY() - tileSize && player->GetX() == (*iter)->GetX()) ||
+						(player->GetFacing() == DOWN && (*iter)->GetY() == player->GetY() + tileSize && player->GetX() == (*iter)->GetX()) ||
+						(player->GetX() == (*iter)->GetX() && player->GetY() == (*iter)->GetY())
+						)
+						{
+						l1->interacting = (*iter);
+						l1->NewDialogue();
+						l1->ChangeState(DIALOGUE);
+						}
+						}
+						}*/
+						l1->CheckInteract();
+
+					}
+					else if (state == LOST)
+						l1->ChangeState(PLAYING);
+					break;
+				}
+			}
+			else if (ev.type == ALLEGRO_EVENT_KEY_UP)
+			{
+				switch (ev.keyboard.keycode)
+				{
+				case ALLEGRO_KEY_ESCAPE:
+					//done = true;
+					break;
+				case ALLEGRO_KEY_UP:
+					keys[UP] = false;
+					break;
+				case ALLEGRO_KEY_DOWN:
+					keys[DOWN] = false;
+					break;
+				case ALLEGRO_KEY_LEFT:
+					keys[LEFT] = false;
+					break;
+				case ALLEGRO_KEY_RIGHT:
+					keys[RIGHT] = false;
+					break;
+				case ALLEGRO_KEY_SPACE:
+					keys[SPACE] = false;
+					break;
+				}
+			}
+			else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+			{
+				done = true;
+			}
+
+			if (render && al_is_event_queue_empty(event_queue))
+			{
+
+				render = false;
+
+
+
+				if (l1->state == TITLE)
+				{
+					al_draw_text(font18, al_map_rgb(100, 200, 120), WIDTH / 2, HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "Ignited, the game.");
+					al_draw_text(font18, al_map_rgb(200, 200, 120), WIDTH / 2, 3 * HEIGHT / 4, ALLEGRO_ALIGN_CENTER, "Press Space to BEGIN");
+
+					//	titleScreen->Render();
+				}
+				else if (l1->state == PLAYING || l1->state == DIALOGUE)
+				{
+					//al_draw_textf(font18, al_map_rgb(255, 200, 200), 10, 10, 0, "Lives: %i Score: %i", ship->GetLives(), ship->GetScore());
+
+					//grid...
+					/*			for (int i = 0; i <= HEIGHT / tileSize; i++)
+								{
+								al_draw_line(0, i*tileSize + tileSize / 2, WIDTH, i*tileSize + tileSize / 2, al_map_rgb(100, 200, 100), 1);
+								}
+
+								for (int i = 0; i <= WIDTH / tileSize; i++)
+								{
+								al_draw_line(i*tileSize + tileSize / 2, 0, i*tileSize + tileSize / 2, HEIGHT, al_map_rgb(100, 200, 100), 1);
+								}
+								*/
+					/*RENDER HERE*/
+					l1->Render();
+					/*Sort by Y*/
+					/*objects.sort(SortByY);
+
+					for (iter = objects.begin(); iter != objects.end(); ++iter)
+					{
+					(*iter)->Render();
+					}
+
+					if (state == DIALOGUE)
+					di->Render();
+					*/
+					if (debug)
+					{
+						double game_time = al_get_time();
+						if (game_time - old_time >= 1.0) {
+							fps = frames_done / (game_time - old_time);
+
+							frames_done = 0;
+							old_time = game_time;
+
+						}
+
+						frames_done++;
+						al_draw_textf(font18, al_map_rgb(255, 230, 100), 10, 10, 0, "FPS: %f", fps);
+
+					}
+
+				}
+				else if (state == LOST)
+				{
+					//	lostScreen->Render();
+				}
+
+
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0, 0, 0));
+			}
+		}
+	
+
+	for (iter = objects.begin(); iter != objects.end();)
+	{
+		(*iter)->Destroy();
+		delete(*iter);
+		iter = objects.erase(iter);
+	}
+
+	//titleScreen->Destroy();
+	//lostScreen->Destroy();
+	//delete titleScreen;
+	//delete lostScreen;
+	/*
+	al_destroy_bitmap(cometImage);
+	al_destroy_bitmap(shipImage);
+	al_destroy_bitmap(explosionImage);
+	al_destroy_bitmap(backgroundImage);
+	al_destroy_bitmap(middlegroundImage);
+	al_destroy_bitmap(foregroundImage);
+	al_destroy_bitmap(titleImage);
+	al_destroy_bitmap(lostImage);*/
+//	al_destroy_bitmap(playerImage);
+//	al_destroy_bitmap(wallImage);
+	//al_destroy_sample(boom);
+	//al_destroy_sample(shot);
+	//al_destroy_sample(song);
+	//al_destroy_sample_instance(songInstance);
+	l1->Destroy();
+
+	al_destroy_timer(timer);
+	al_destroy_event_queue(event_queue);
+	al_destroy_display(display);
+
+	return 0;
+}
+
+void __cdecl TakeLife()
+{
+//	ship->LoseLife();
+}
+
+void __cdecl ScorePoint()
+{
+//	ship->AddPoint();
+}
+
+void ChangeState(int &state, int newState)
+{
+	if (state == TITLE)
+	{
+	}
+	else if (state == PLAYING)
+	{
+		/*for (iter = objects.begin(); iter != objects.end(); ++iter)
+		{
+			if (!(*iter)->CheckID(PLAYER) && !(*iter)->CheckID(MISC))
+			{
+				(*iter)->SetAlive(false);
+			}
+		}*/
+
+		//al_stop_sample_instance(songInstance);
+	}
+	else if (state == LOST)
+	{
+	}
+
+	state = newState;
+
+	if (state == TITLE)
+	{
+
+	}
+	else if (state == PLAYING)
+	{
+		//player->Init(playerImage);
+		//al_play_sample_instance(songInstance);
+	}
+	else if (state == LOST)
+	{
+	}
+}
+/*
+bool SortByY(GameObject *a, GameObject *b)
+{
+	if (a->GetZ() == b->GetZ())
+		return (a->GetY() < b->GetY());
+	else
+		return (a->GetZ() < b->GetZ());
+}
+*/

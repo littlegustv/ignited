@@ -1,0 +1,6 @@
+-I hate you!
+{
+	-ACTION
+	{CINEMATIC./Data/bedroom2.data
+	}
+}
